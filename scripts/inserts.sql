@@ -17,7 +17,7 @@ GO
 
 -- ATUALIZA PRECO DA PASSAGEM, SEMPRE QUE ESTA FOR INSERIDA COM UMA PROMOCAO
 ----------------------------------------------------------------------------------------------------
-CREATE TRIGGER Ins_Preco_Passagem
+CREATE TRIGGER Ins_Promocao_Passagem
 ON PASSAGEM
 FOR INSERT
 AS BEGIN
@@ -29,10 +29,14 @@ AS BEGIN
 	DECLARE @Preco_Antes NUMERIC(7,2)
 	SELECT @Preco_Antes = Preco FROM INSERTED
 
-	IF (@Cod_Promocao IS NOT NULL)
+	IF (@Cod_Promocao IS NULL)
+	BEGIN
+		PRINT 'Nenhum desconto aplicado. Preço: ' + CAST((@Preco_Antes) AS VARCHAR(10))
+	END
+	ELSE
 	BEGIN
 		DECLARE @Perc_Desconto NUMERIC(3,2)
-		SELECT @Perc_Desconto = P.Desconto FROM PROMOCAO AS P WHERE P.Cod = @Cod_Promocao
+		SELECT @Perc_Desconto = Desconto FROM PROMOCAO WHERE Cod = @Cod_Promocao
 
 		DECLARE @Preco_Depois NUMERIC(7,2)
 		SET @Preco_Depois = @Preco_Antes * (1 - @Perc_Desconto)
@@ -40,17 +44,13 @@ AS BEGIN
 		UPDATE PASSAGEM SET Preco = @Preco_Depois WHERE Cod = @Cod_Passagem
 		PRINT 'Desconto aplicado. Novo preço: ' + CAST((@Preco_Depois) AS VARCHAR(10))
 	END
-	ELSE
-	BEGIN
-		PRINT 'Nenhum desconto aplicado. Preço: ' + CAST((@Preco_Antes) AS VARCHAR(10))
-	END
 
 END
 GO
 
--- ATUALIZA PRECO DA PASSAGEM, SEMPRE QUE ESTA TIVER UMA PROMOCAO ALTERADA/REMOVIDA
+-- ATUALIZA PRECO DA PASSAGEM, SEMPRE QUE ESTA TIVER UMA PROMOCAO ADICIONADA/ALTERADA/REMOVIDA
 ----------------------------------------------------------------------------------------------------
-CREATE TRIGGER Upd_Preco_Passagem
+CREATE TRIGGER Upd_Promocao_Passagem
 ON PASSAGEM
 FOR UPDATE
 AS BEGIN
@@ -60,52 +60,59 @@ AS BEGIN
 	SELECT @Cod_Promocao_Antes = Cod_Promocao FROM DELETED
 	SELECT @Cod_Promocao_Depois = Cod_Promocao FROM INSERTED
 
-	DECLARE @Perc_Desconto NUMERIC(3,2) -- ARMAZENA OS PERCENTUAIS DE DESCONTO...
-
-	/* PRECO ANTES DO UPDATE (COM OU SEM DESCONTO) */
-	/**************************************************/
-	DECLARE @Preco_Antes NUMERIC(7,2)
-	SELECT @Preco_Antes = Preco FROM DELETED
-	/**************************************************/
-
-	/* PRECO NORMAL DA PASSAGEM (SEM DESCONTOS) */
-	/**************************************************/
-	DECLARE @Preco NUMERIC(7,2)
-
-	IF (@Cod_Promocao_Antes IS NULL)
+	IF (@Cod_Promocao_Antes = @Cod_Promocao_Depois)
 	BEGIN
-		SET @Preco = @Preco_Antes -- PRECO NAO TINHA DESCONTO
-		PRINT 'Preço atualizado não tinha desconto.'
+		PRINT 'Campo Cod_Promocao não foi alterado.'
 	END
 	ELSE
 	BEGIN
-		SELECT @Perc_Desconto = P.Desconto FROM PROMOCAO AS P WHERE P.Cod = @Cod_Promocao_Antes
-		SET @Preco = @Preco_Antes / (1 - @Perc_Desconto) -- REMOVE DESCONTO
-	END
-	/**************************************************/
+		DECLARE @Perc_Desconto NUMERIC(3,2) -- ARMAZENA OS PERCENTUAIS DE DESCONTO...
 
-	/* CALCULA NOVO PRECO (COM OU SEM DESCONTO) */
-	/**************************************************/
-	DECLARE @Preco_Depois NUMERIC(7,2)
+		/* PRECO ANTES DO UPDATE (COM OU SEM DESCONTO) */
+		/**************************************************/
+		DECLARE @Preco_Antes NUMERIC(7,2)
+		SELECT @Preco_Antes = Preco FROM DELETED
+		/**************************************************/
 
-	IF (@Cod_Promocao_Depois IS NULL)
-	BEGIN
-		SET @Preco_Depois = @Preco -- NOVO PRECO NAO TEM DESCONTO
-		PRINT 'Nenhum desconto aplicado.'
-	END
-	ELSE
-	BEGIN
-		SELECT @Perc_Desconto = P.Desconto FROM PROMOCAO AS P WHERE P.Cod = @Cod_Promocao_Depois
-		SET @Preco_Depois = @Preco * (1 - @Perc_Desconto) -- ATUALIZA PRECO
-		PRINT 'Desconto aplicado.'
-	END
-	/**************************************************/
+		/* PRECO NORMAL DA PASSAGEM (SEM DESCONTOS) */
+		/**************************************************/
+		DECLARE @Preco NUMERIC(7,2)
 
-	/* APLICA NOVO PRECO (COM OU SEM DESCONTO) */
-	/**************************************************/
-	UPDATE PASSAGEM SET Preco = @Preco_Depois WHERE Cod = @Cod_Passagem
-	PRINT 'Novo preço: ' + CAST((@Preco_Depois) AS VARCHAR(10))
-	/**************************************************/
+		IF (@Cod_Promocao_Antes IS NULL)
+		BEGIN
+			SET @Preco = @Preco_Antes -- PRECO NAO TINHA DESCONTO
+			PRINT 'Preço anterior não tinha desconto.'
+		END
+		ELSE
+		BEGIN
+			SELECT @Perc_Desconto = Desconto FROM PROMOCAO WHERE Cod = @Cod_Promocao_Antes
+			SET @Preco = @Preco_Antes / (1 - @Perc_Desconto) -- REMOVE DESCONTO
+		END
+		/**************************************************/
+
+		/* CALCULA NOVO PRECO (COM OU SEM DESCONTO) */
+		/**************************************************/
+		DECLARE @Preco_Depois NUMERIC(7,2)
+
+		IF (@Cod_Promocao_Depois IS NULL)
+		BEGIN
+			SET @Preco_Depois = @Preco -- NOVO PRECO NAO TEM DESCONTO
+			PRINT 'Desconto removido.'
+		END
+		ELSE
+		BEGIN
+			SELECT @Perc_Desconto = Desconto FROM PROMOCAO WHERE Cod = @Cod_Promocao_Depois
+			SET @Preco_Depois = @Preco * (1 - @Perc_Desconto) -- APLICA DESCONTO
+			PRINT 'Desconto aplicado.'
+		END
+		/**************************************************/
+
+		/* APLICA NOVO PRECO */
+		/**************************************************/
+		UPDATE PASSAGEM SET Preco = @Preco_Depois WHERE Cod = @Cod_Passagem
+		PRINT 'Novo preço: ' + CAST((@Preco_Depois) AS VARCHAR(10))
+		/**************************************************/
+	END
 
 END
 GO
@@ -113,10 +120,10 @@ GO
 -- CALCULA PRECO DO PACOTE COM BASE NOS ITENS - PASSAGENS, HOTEIS E/OU PASSEIOS - QUE O COMPOEM
 ----------------------------------------------------------------------------------------------------
 CREATE FUNCTION Preco_Pacote(@Cod INT)
-RETURNS INT
+RETURNS NUMERIC(8,2)
 AS BEGIN
 
-	DECLARE @Preco INT
+	DECLARE @Preco NUMERIC(8,2)
 	
 	SET @Preco = (SELECT
 		COALESCE((SELECT SUM(P.Preco) AS Total_Passagens FROM PASSAGEM AS P
@@ -164,6 +171,7 @@ INSERT INTO HOTEL (Cod, Preco, Nome, Rua, CEP) VALUES (17, 599.90, 'Hotel 18', '
 INSERT INTO HOTEL (Cod, Preco, Nome, Rua, CEP) VALUES (18, 299.90, 'Hotel 19', 'Rua do Mar', '00000019')
 INSERT INTO HOTEL (Cod, Preco, Nome, Rua, CEP) VALUES (19, 599.90, 'Hotel 20', 'Rua dos Tomates', '00000020')
 SELECT * FROM HOTEL
+GO
 
 -- POPULA TABELA 'PESSOA'
 ----------------------------------------------------------------------------------------------------
@@ -193,6 +201,7 @@ INSERT INTO PESSOA (CPF, Nome, Data_Nasc, Nacionalidade, RG, Logradouro, Numero,
 INSERT INTO PESSOA (CPF, Nome, Data_Nasc, Nacionalidade, RG, Logradouro, Numero, CEP) VALUES ('00000000024', 'Gabriel Y.', '2001-12-24', 'Chile', '000000024', 'Rua 24 de Dezembro', 2060, '00000044')
 INSERT INTO PESSOA (CPF, Nome, Data_Nasc, Nacionalidade, RG, Logradouro, Numero, CEP) VALUES ('00000000025', 'Amanda Z.', '2002-01-25', 'Uruguai', '000000025', 'Rua 25 de Janeiro', 2070, '00000045')
 SELECT * FROM PESSOA
+GO
 
 -- POPULA TABELA 'PESSOA_TELEFONE'
 ----------------------------------------------------------------------------------------------------
@@ -222,6 +231,7 @@ INSERT INTO PESSOA_TELEFONE VALUES ('00000000023', '57000000023')
 INSERT INTO PESSOA_TELEFONE VALUES ('00000000024', '56000000024')
 INSERT INTO PESSOA_TELEFONE VALUES ('00000000025', '59800000025')
 SELECT * FROM PESSOA_TELEFONE
+GO
 
 -- POPULA TABELA 'ATENDENTE'
 ----------------------------------------------------------------------------------------------------
@@ -231,6 +241,7 @@ INSERT INTO ATENDENTE VALUES ('00000000003', 2, 1950.00, 'D')
 INSERT INTO ATENDENTE VALUES ('00000000004', 3, 1750.00, 'M')
 INSERT INTO ATENDENTE VALUES ('00000000005', 3, 1750.00, 'V')
 SELECT * FROM ATENDENTE
+GO
 
 -- POPULA TABELA 'GUIA_TURISTICO'
 ----------------------------------------------------------------------------------------------------
@@ -245,6 +256,7 @@ INSERT INTO GUIA_TURISTICO VALUES ('00000000013', 3, 2300.00, 22, '2024-12-31T23
 INSERT INTO GUIA_TURISTICO VALUES ('00000000014', 3, 2300.00, 23, '2024-12-31T23:59:59', '00000000011')
 INSERT INTO GUIA_TURISTICO VALUES ('00000000015', 3, 2300.00, 24, '2024-12-31T23:59:59', '00000000011')
 SELECT * FROM GUIA_TURISTICO
+GO
 
 -- POPULA TABELA 'PASSEIO'
 ----------------------------------------------------------------------------------------------------
@@ -269,6 +281,7 @@ INSERT INTO PASSEIO VALUES (17, 144.99, '10:00:00', 'Tour pela cidade', '0000000
 INSERT INTO PASSEIO VALUES (18, 74.99, '16:30:00', 'Centro', '00000000015')
 INSERT INTO PASSEIO VALUES (19, 147.99, '14:30:00', 'Parque de diversões', '00000000015')
 SELECT * FROM PASSEIO
+GO
 
 -- POPULA TABELA 'PROMOCAO'
 ----------------------------------------------------------------------------------------------------
@@ -281,6 +294,7 @@ INSERT INTO PROMOCAO VALUES (5, 0.50) -- 50% DESCONTO
 INSERT INTO PROMOCAO VALUES (6, 0.70) -- 70% DESCONTO
 INSERT INTO PROMOCAO VALUES (7, 1.00) -- 100% DESCONTO
 SELECT * FROM PROMOCAO
+GO
 
 
 -- MONTA OS PACOTES DE CADA PESSOA
@@ -289,28 +303,17 @@ SELECT * FROM PROMOCAO
 
 -- LUCAS P. (CPF 00000000016) - PACOTES #0, #1, #2, #3
 ----------------------------------------------------------------------------------------------------
--- CRIA PACOTE #1
+-- MONTA PACOTE #0
 INSERT INTO PACOTE (Cod) VALUES (0)
--- PASSAGEM
-INSERT INTO PASSAGEM (Cod, Preco, Companhia, Destino, CPF_Pessoa, Data) VALUES (0, 250.00, 'Companhia 1', 'Rio de Janeiro', '00000000016', '2020-06-11')
+-- ADD PASSAGEM
+INSERT INTO PASSAGEM (Cod, Preco, Companhia, Destino, CPF_Pessoa, Data, Cod_Promocao) VALUES (0, 250.00, 'Companhia 1', 'Rio de Janeiro', '00000000016', '2020-06-12', NULL)
 INSERT INTO P_PASSAGEM VALUES (0, 0)
-delete from PASSAGEM where Cod = 0
-UPDATE PASSAGEM SET Cod_Promocao = NULL WHERE Cod = 0
-select * from PASSAGEM
-
-delete from P_PASSAGEM
-select * from p_passagem
--- HOTEL
+-- ADD HOTEL
 UPDATE PESSOA SET Cod_Hotel = 0 WHERE CPF = '00000000016'
 INSERT INTO P_HOTEL VALUES (0, 0)
--- PASSEIO
+-- ADD PASSEIO
 INSERT INTO AGENDA VALUES ('00000000016', 0)
 INSERT INTO P_PASSEIO VALUES (0, 0)
--- FECHA PACOTE #1
+-- FECHA PACOTE #0
 UPDATE PACOTE SET Preco = (SELECT dbo.Preco_Pacote(0)) WHERE Cod = 0
-
-
-select * from P_PASSAGEM
-select * from P_HOTEL
-select * from P_PASSEIO
-select * from PACOTE
+GO
