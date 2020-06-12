@@ -1,0 +1,24 @@
+DESTINOS vs PESSOAS (Companhia 1, Companhia 2, Companhia 3)
+A : 1, 2, 3, 4, 5 --> Rio de Janeiro (1, 1, 1, 1, 2)
+B : 6, 7, 8, 9    --> Fernando de Noronha (1, 1, 1, 2)
+C : 10, 1, 2, 3   --> Florianópolis (1, 1, 2, 2)
+D : 4, 5, 6       --> Fortaleza (1, 1, 2)
+E : 7, 8, 9       --> Salvador (1, 1, 2)
+F : 10, 1, 2      --> Natal (1, 1, 2)
+G : 3, 4          --> Manaus (1, 2)
+H : 5, 6          --> Brasilia (1, 2)
+I : 7, 8          --> Bogotá (3, 3)
+J : 9, 10         --> Santiago (3, 3)
+k : 1             --> Montevidéu (3)
+
+PESSOAS vs DESTINOS
+1 : A, C, F, k --> Lucas P. (#1)
+2 : A, C, F    --> Patrícia Q.
+3 : A, C, G    --> Luiz R.
+4 : A, D, G    --> Aline S.
+5 : A, D, H    --> Marcos T. (#0)
+6 : B, D, H    --> Sandra U.
+7 : B, E, I    --> Luís V.
+8 : B, E, I    --> Camila X. (#0)
+9 : B, E, J    --> Gabriel Y.
+10 : C, F, J   --> Amanda Z. (#6)
