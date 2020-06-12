@@ -9,29 +9,29 @@
 
 -- COMANDOS PARA DROPAR AS TABELAS
 ----------------------------------------------------------------------------------------------------
-DROP TABLE P_PASSEIO;
-DROP TABLE P_HOTEL;
-DROP TABLE P_PASSAGEM;
-DROP TABLE AGENDA;
-DROP TABLE OFERECE;
-DROP TABLE PASSEIO;
-DROP TABLE PASSAGEM;
-DROP TABLE PROMOCAO;
-DROP TABLE PACOTE;
-DROP TABLE GUIA_TURISTICO;
-DROP TABLE ATENDENTE;
-DROP TABLE PESSOA_TELEFONE;
-DROP TABLE PESSOA;
-DROP TABLE HOTEL;
+DROP TABLE P_PASSEIO
+DROP TABLE P_HOTEL
+DROP TABLE P_PASSAGEM
+DROP TABLE AGENDA
+DROP TABLE OFERECE
+DROP TABLE PASSEIO
+DROP TABLE PASSAGEM
+DROP TABLE PROMOCAO
+DROP TABLE PACOTE
+DROP TABLE GUIA_TURISTICO
+DROP TABLE ATENDENTE
+DROP TABLE PESSOA_TELEFONE
+DROP TABLE PESSOA
+DROP TABLE HOTEL
 
 -- DROPAR TODA BASE DE DADOS
-DROP DATABASE OPERTUR;
+DROP DATABASE OPERTUR
 
 
 -- CRIA BASE DE DADOS 'OPERTUR'
 ----------------------------------------------------------------------------------------------------
-CREATE DATABASE OPERTUR;
-USE OPERTUR;
+CREATE DATABASE OPERTUR
+USE OPERTUR
 
 
 -- TABELA 'HOTEL'
@@ -46,7 +46,7 @@ CREATE TABLE HOTEL (
 	Complemento VARCHAR(50),
 
 	CONSTRAINT PK_HOTEL PRIMARY KEY(Cod)
-);
+)
 
 -- TABELA 'PESSOA'
 ----------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ CREATE TABLE PESSOA (
 
 	CONSTRAINT PK_PESSOA PRIMARY KEY(CPF),
 	CONSTRAINT FK_PESSOA_HOTEL FOREIGN KEY(Cod_Hotel) REFERENCES HOTEL(Cod)
-);
+)
 
 -- TABELA 'PESSOA_TELEFONE'
 ----------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ CREATE TABLE PESSOA_TELEFONE (
 
 	CONSTRAINT PK_PESSOA_TELEFONE PRIMARY KEY(CPF_Pessoa, Telefone),
 	CONSTRAINT FK_PESSOA_TELEFONE_PESSOA FOREIGN KEY(CPF_Pessoa) REFERENCES PESSOA(CPF)
-);
+)
 
 -- TABELA 'ATENDENTE'
 ----------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ CREATE TABLE ATENDENTE (
 
 	CONSTRAINT PK_ATENDENTE PRIMARY KEY(CPF_Atendente),
 	CONSTRAINT FK_ATENDENTE_PESSOA FOREIGN KEY(CPF_Atendente) REFERENCES PESSOA(CPF)
-);
+)
 
 -- TABELA 'GUIA_TURISTICO'
 ----------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ CREATE TABLE GUIA_TURISTICO (
 	CONSTRAINT PK_GUIA_TURISTICO PRIMARY KEY(CPF_Guia),
 	CONSTRAINT FK_GUIA_TURISTICO_PESSOA FOREIGN KEY(CPF_Guia) REFERENCES PESSOA(CPF),
 	CONSTRAINT FK_GUIA_TURISTICO_GUIA_TURISTICO FOREIGN KEY(CPF_Supervisor) REFERENCES GUIA_TURISTICO(CPF_Guia)
-);
+)
 
 -- TABELA 'PACOTE'
 ----------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ CREATE TABLE PACOTE (
 	Preco NUMERIC(7,2),
 
 	CONSTRAINT PK_PACOTE PRIMARY KEY(Cod)
-);
+)
 
 -- TABELA 'PROMOCAO'
 ----------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ CREATE TABLE PROMOCAO (
 	Desconto NUMERIC(3,2) UNIQUE NOT NULL,
 
 	CONSTRAINT PK_PROMOCAO PRIMARY KEY(Cod)
-);
+)
 
 -- TABELA 'PASSAGEM'
 ----------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ CREATE TABLE PASSAGEM (
 	CONSTRAINT PK_PASSAGEM PRIMARY KEY(Cod),
 	CONSTRAINT FK_PASSAGEM_PESSOA FOREIGN KEY(CPF_Pessoa) REFERENCES PESSOA(CPF),
 	CONSTRAINT FK_PASSAGEM_PROMOCAO FOREIGN KEY(Cod_Promocao) REFERENCES PROMOCAO(Cod)
-);
+)
 
 -- TABELA 'PASSEIO'
 ----------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ CREATE TABLE PASSEIO (
 
 	CONSTRAINT PK_PASSEIO PRIMARY KEY(Cod),
 	CONSTRAINT FK_PASSEIO_GUIA_TURISTICO FOREIGN KEY(CPF_Guia) REFERENCES GUIA_TURISTICO(CPF_Guia)
-);
+)
 
 -- TABELA 'OFERECE'
 ----------------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ CREATE TABLE OFERECE (
 	CONSTRAINT FK_OFERECE_PESSOA FOREIGN KEY(CPF_Pessoa) REFERENCES PESSOA(CPF),
 	CONSTRAINT FK_OFERECE_PACOTE FOREIGN KEY(Cod_Pacote) REFERENCES PACOTE(Cod),
 	CONSTRAINT FK_OFERECE_ATENDENTE FOREIGN KEY(CPF_Atendente) REFERENCES ATENDENTE(CPF_Atendente)
-);
+)
 
 -- TABELA 'AGENDA'
 ----------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ CREATE TABLE AGENDA (
 	CONSTRAINT PK_AGENDA PRIMARY KEY(CPF_Pessoa, Cod_Passeio),
 	CONSTRAINT FK_AGENDA_PESSOA FOREIGN KEY(CPF_Pessoa) REFERENCES PESSOA(CPF),
 	CONSTRAINT FK_AGENDA_PASSEIO FOREIGN KEY(Cod_Passeio) REFERENCES PASSEIO(Cod)
-);
+)
 
 -- TABELA 'P_PASSAGEM'
 ----------------------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ CREATE TABLE P_PASSAGEM (
 	CONSTRAINT PK_P_PASSAGEM PRIMARY KEY(Cod_Pacote, Cod_Passagem),
 	CONSTRAINT FK_P_PASSAGEM_PACOTE FOREIGN KEY(Cod_Pacote) REFERENCES PACOTE(Cod),
 	CONSTRAINT FK_P_PASSAGEM_PASSAGEM FOREIGN KEY(Cod_Passagem) REFERENCES PASSAGEM(Cod)
-);
+)
 
 -- TABELA 'P_HOTEL'
 ----------------------------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ CREATE TABLE P_HOTEL (
 	CONSTRAINT PK_P_HOTEL PRIMARY KEY(Cod_Pacote, Cod_Hotel),
 	CONSTRAINT FK_P_HOTEL_PACOTE FOREIGN KEY(Cod_Pacote) REFERENCES PACOTE(Cod),
 	CONSTRAINT FK_P_HOTEL_HOTEL FOREIGN KEY(Cod_Hotel) REFERENCES HOTEL(Cod)
-);
+)
 
 -- TABELA 'P_PASSEIO'
 ----------------------------------------------------------------------------------------------------
@@ -207,4 +207,4 @@ CREATE TABLE P_PASSEIO (
 	CONSTRAINT PK_P_PASSEIO PRIMARY KEY(Cod_Pacote, Cod_Passeio),
 	CONSTRAINT FK_P_PASSEIO_PACOTE FOREIGN KEY(Cod_Pacote) REFERENCES PACOTE(Cod),
 	CONSTRAINT FK_P_PASSEIO_PASSEIO FOREIGN KEY(Cod_Passeio) REFERENCES PASSEIO(Cod)
-);
+)
