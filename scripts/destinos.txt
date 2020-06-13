@@ -11,7 +11,7 @@ I : 7, 8          --> Bogotá              (3, 3)          --> 16, 17
 J : 9, 10         --> Santiago            (3, 3)          --> 18, 19
 k : 1             --> Montevidéu          (3)             --> (nenhum)
 
-PESSOAS vs DESTINOS
+PESSOAS vs DESTINOS (Promoção)
 1 : A, C, F, k --> Lucas P. (#1)
 2 : A, C, F    --> Patrícia Q.
 3 : A, C, G    --> Luiz R.
