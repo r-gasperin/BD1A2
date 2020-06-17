@@ -252,3 +252,98 @@ SELECT (
 	INNER JOIN GUIA_TURISTICO AS G ON P.CPF = G.CPF_Guia)
 ) AS [Total de funcionarios]
 GO
+
+-- EXERCICIO #7
+-- Quais passagens estão disponíveis para o destino escolhido, e seu preço?
+----------------------------------------------------------------------------------------------------
+SELECT C.Companhia, DC.Preco FROM DESTINO AS D
+INNER JOIN DESTINO_COMPANHIA AS DC ON D.Cod = DC.Cod_Destino
+INNER JOIN COMPANHIA AS C ON DC.Cod_Companhia = C.Cod
+WHERE D.Destino = 'Rio de Janeiro' -- Destino aqui...
+GO
+
+-- EXERCICIO #8
+-- Quais hotéis estão disponíveis para o destino escolhido, e seu preço?
+----------------------------------------------------------------------------------------------------
+SELECT H.Cod, H.Nome, H.Rua, H.CEP, H.Preco FROM HOTEL AS H
+INNER JOIN DESTINO AS D ON H.Cod_Destino = D.Cod
+WHERE D.Destino = 'Fernando de Noronha' -- Destino aqui...
+GO
+
+-- EXERCICIO #9
+-- Quais passeios estão disponíveis para o destino escolhido, e seu preço?
+----------------------------------------------------------------------------------------------------
+SELECT PA.Cod, PA.Destino, PA.Hora, PE.Nome as [Nome Guia], PA.Preco FROM PASSEIO AS PA
+INNER JOIN DESTINO AS D ON PA.Cod_Destino = D.Cod
+INNER JOIN PESSOA AS PE ON PA.CPF_Guia = PE.CPF
+WHERE D.Destino = 'Florianópolis' -- Destino aqui...
+GO
+
+-- EXERCICIO #10
+-- Quais os 10 destinos mais visitados?
+----------------------------------------------------------------------------------------------------
+SELECT PA.Destino, COUNT(*) AS [Num. de visitas] FROM PACOTE AS PC
+INNER JOIN P_PASSAGEM AS PP ON PC.Cod = PP.Cod_Pacote
+INNER JOIN PASSAGEM AS PA ON PP.Cod_Passagem = PA.Cod
+GROUP BY PA.Destino
+ORDER BY [Num. de visitas] DESC
+OFFSET 0 ROWS FETCH FIRST 10 ROWS ONLY
+GO
+
+-- EXERCICIO #11
+-- Quais passagens estão disponíveis para um destino escolhido ordenado de menor para maior preço?
+----------------------------------------------------------------------------------------------------
+SELECT C.Companhia, DC.Preco FROM DESTINO AS D
+INNER JOIN DESTINO_COMPANHIA AS DC ON D.Cod = DC.Cod_Destino
+INNER JOIN COMPANHIA AS C ON DC.Cod_Companhia = C.Cod
+WHERE D.Destino = 'Fortaleza' -- Destino aqui...
+ORDER BY DC.Preco ASC
+GO
+
+-- EXERCICIO #12
+-- Quais hotéis estão disponíveis para um destino escolhido ordenado de menor para maior preço?
+----------------------------------------------------------------------------------------------------
+SELECT H.Cod, H.Nome, H.Rua, H.CEP, H.Preco FROM HOTEL AS H
+INNER JOIN DESTINO AS D ON H.Cod_Destino = D.Cod
+WHERE D.Destino = 'Salvador' -- Destino aqui...
+ORDER BY H.Preco ASC
+GO
+
+-- EXERCICIO #13
+-- Quais passeios estão disponíveis para um destino escolhido ordenado de menor para maior preço?
+----------------------------------------------------------------------------------------------------
+SELECT PA.Cod, PA.Destino, PA.Hora, PE.Nome as [Nome Guia], PA.Preco FROM PASSEIO AS PA
+INNER JOIN DESTINO AS D ON PA.Cod_Destino = D.Cod
+INNER JOIN PESSOA AS PE ON PA.CPF_Guia = PE.CPF
+WHERE D.Destino = 'Natal' -- Destino aqui...
+ORDER BY PA.Preco ASC
+GO
+
+-- EXERCICIO #14
+-- Quais passagens estão disponíveis para um destino escolhido ordenado de maior para menor preço?
+----------------------------------------------------------------------------------------------------
+SELECT C.Companhia, DC.Preco FROM DESTINO AS D
+INNER JOIN DESTINO_COMPANHIA AS DC ON D.Cod = DC.Cod_Destino
+INNER JOIN COMPANHIA AS C ON DC.Cod_Companhia = C.Cod
+WHERE D.Destino = 'Manaus' -- Destino aqui...
+ORDER BY DC.Preco DESC
+GO
+
+-- EXERCICIO #15
+-- Quais hotéis estão disponíveis para um destino escolhido ordenado de maior para menor preço?
+----------------------------------------------------------------------------------------------------
+SELECT H.Cod, H.Nome, H.Rua, H.CEP, H.Preco FROM HOTEL AS H
+INNER JOIN DESTINO AS D ON H.Cod_Destino = D.Cod
+WHERE D.Destino = 'Brasília' -- Destino aqui...
+ORDER BY H.Preco DESC
+GO
+
+-- EXERCICIO #16
+-- Quais passeios estão disponíveis para um destino escolhido ordenado de maior para menor preço?
+----------------------------------------------------------------------------------------------------
+SELECT PA.Cod, PA.Destino, PA.Hora, PE.Nome as [Nome Guia], PA.Preco FROM PASSEIO AS PA
+INNER JOIN DESTINO AS D ON PA.Cod_Destino = D.Cod
+INNER JOIN PESSOA AS PE ON PA.CPF_Guia = PE.CPF
+WHERE D.Destino = 'Bogotá' -- Destino aqui...
+ORDER BY PA.Preco DESC
+GO
