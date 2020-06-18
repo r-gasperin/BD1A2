@@ -347,3 +347,22 @@ INNER JOIN PESSOA AS PE ON PA.CPF_Guia = PE.CPF
 WHERE D.Destino = 'Bogotá' -- Destino aqui...
 ORDER BY PA.Preco DESC
 GO
+
+-- EXERCICIO #17
+-- Quantos guias estão disponíveis no destino escolhido?
+----------------------------------------------------------------------------------------------------
+SELECT COUNT(*) AS [Total de guias] FROM GUIA_TURISTICO AS G
+INNER JOIN PASSEIO AS PA ON G.CPF_Guia = PA.CPF_Guia
+INNER JOIN DESTINO AS D ON PA.Cod_Destino = D.Cod
+WHERE D.Destino = 'Santiago' -- Destino aqui...
+GO
+
+-- EXERCICIO #18
+-- Quanto vendeu cada atendente, ordenado de maior para menor?
+----------------------------------------------------------------------------------------------------
+SELECT PE.Nome, PE.CPF, A.Cod_Empresa, COUNT(*) AS [Pacotes vendidos] FROM PESSOA AS PE
+INNER JOIN ATENDENTE AS A ON PE.CPF = A.CPF_Atendente
+INNER JOIN OFERECE AS O ON A.CPF_Atendente = O.CPF_Atendente
+GROUP BY PE.Nome, PE.CPF, A.Cod_Empresa
+ORDER BY [Pacotes vendidos] DESC
+GO
