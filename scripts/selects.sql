@@ -282,10 +282,8 @@ GO
 -- EXERCICIO #10
 -- Quais os 10 destinos mais visitados?
 ----------------------------------------------------------------------------------------------------
-SELECT PA.Destino, COUNT(*) AS [Num. de visitas] FROM PACOTE AS PC
-INNER JOIN P_PASSAGEM AS PP ON PC.Cod = PP.Cod_Pacote
-INNER JOIN PASSAGEM AS PA ON PP.Cod_Passagem = PA.Cod
-GROUP BY PA.Destino
+SELECT Destino, COUNT(*) AS [Num. de visitas] FROM PASSAGEM
+GROUP BY Destino
 ORDER BY [Num. de visitas] DESC
 OFFSET 0 ROWS FETCH FIRST 10 ROWS ONLY
 GO
